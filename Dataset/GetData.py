@@ -57,4 +57,4 @@ class MovieReviewDataset:
 
 if __name__ == "__main__":
     dataset = MovieReviewDataset()
-    dataset.saveMovieData(6506000,6507000)
+    dataset.saveMovieData(6507000,6507010)
