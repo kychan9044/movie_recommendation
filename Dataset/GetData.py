@@ -9,7 +9,7 @@ MIN_RATING = 6
 
 class MovieReviewDataset:
     def __init__(self):
-        self.dataset = np.array(["index","name","link","rating","review"],str).reshape(1,5)
+        self.dataset = np.array(["index","name","link","rating", "date", "review"],str).reshape(1,6)
         # self.dataset = np.array([])
     
     def _parse_review_data(self, index:int):
@@ -34,11 +34,18 @@ class MovieReviewDataset:
             movie_name = movie.get_text()
             # print(movie_name, link)
 
+            # 날짜
+            review_date = soup.select_one('.review-date')
+            if review_date == None:
+                review_date = ""
+            else:
+                review_date = review_date.get_text()
+
             # 리뷰
             review = soup.select_one('div.text.show-more__control')
             review = review.get_text()
             # print(review.get_text())
-            result = np.array([index_num, movie_name, link, rating, review],dtype=str).reshape(1,5)
+            result = np.array([index_num, movie_name, link, rating, review_date, review],dtype=str).reshape(1,6)
             self.dataset = np.append(self.dataset, result, axis=0)
 
         except Exception as e:
