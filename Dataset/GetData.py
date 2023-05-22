@@ -58,7 +58,7 @@ class MovieReviewDataset:
             self._parse_review_data(i)
 
         df = pd.DataFrame(self.dataset)
-        file_name = 'moview_'+str(start_num)+'_'+str(end_num)+'.xlsx'
+        file_name = 'movie_'+str(start_num)+'_'+str(end_num)+'.xlsx'
         df.to_excel(file_name, index=False)
         # np.savetxt(file_name,self.dataset, delimiter=',',fmt='%s')
 
@@ -79,5 +79,5 @@ if __name__ == "__main__":
     # dataset.saveMovieData(9080000,9089999)
     
     # 파일 합치기
-    MovieReviewDataset.mergeMovieData("moview_9000000_9009999.xlsx", ["moview_9010000_9019999.xlsx", "moview_9020000_9059999.xlsx", "moview_9060000_9069999.xlsx"])
+    MovieReviewDataset.mergeMovieData("movie_9000000_9009999.xlsx", ["movie_9010000_9019999.xlsx", "movie_9020000_9059999.xlsx", "movie_9060000_9069999.xlsx"])
     
