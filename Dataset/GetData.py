@@ -11,13 +11,13 @@ class MovieReviewDataset:
     def __init__(self):
         self.dataset = np.array(["index","name","link","rating", "date", "review"],str).reshape(1,6)
         # self.dataset = np.array([])
-    
+
     def _parse_review_data(self, index:int):
         try:
             index_num = str(index).zfill(7)
             response = requests.get(REVIEW_URL_START+index_num+REVIEW_URL_END)
             soup = BeautifulSoup(response.text, "html.parser")
-            
+
             # 평점
             rating = soup.select_one('span.rating-other-user-rating span')
             rating = rating.get_text()
@@ -51,8 +51,8 @@ class MovieReviewDataset:
         except Exception as e:
             print(e)
             print("Fail to parse web :"+REVIEW_URL_START+index_num+REVIEW_URL_END)
-            # raise Exception("Fail to parse web :"+REVIEW_URL_START+index_num+REVIEW_URL_END) 
-    
+            # raise Exception("Fail to parse web :"+REVIEW_URL_START+index_num+REVIEW_URL_END)
+
     def saveMovieData(self, start_num:int, end_num:int):
         for i in range(start_num, end_num+1):
             self._parse_review_data(i)
@@ -62,6 +62,22 @@ class MovieReviewDataset:
         df.to_excel(file_name, index=False)
         # np.savetxt(file_name,self.dataset, delimiter=',',fmt='%s')
 
+    @staticmethod
+    def mergeMovieData(target, file_list):
+        merged_data = pd.read_excel(target)
+        print(merged_data.shape)
+
+        for file in file_list:
+            data = pd.read_excel(file)
+            print(data.shape)
+            merged_data = pd.concat([merged_data,data])
+
+        merged_data.to_excel("merged_file.xlsx", index=False)
+
 if __name__ == "__main__":
-    dataset = MovieReviewDataset()
-    dataset.saveMovieData(6507000,6507010)
+    # dataset = MovieReviewDataset()
+    # dataset.saveMovieData(9080000,9089999)
+    
+    # 파일 합치기
+    MovieReviewDataset.mergeMovieData("moview_9000000_9009999.xlsx", ["moview_9010000_9019999.xlsx", "moview_9020000_9059999.xlsx", "moview_9060000_9069999.xlsx"])
+    
