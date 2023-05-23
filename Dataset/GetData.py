@@ -3,62 +3,64 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-REVIEW_URL_START = 'https://www.imdb.com/review/rw'
-REVIEW_URL_END = '/?ref_=tt_urv'
-MIN_RATING = 6
+REVIEW_URL_START = 'https://www.imdb.com'
+REVIEW_URL_END = 'reviews'
+RATING_URL = 'ratingFilter='
+RATING = ['6','7','8','9','10']
+SORT_URL = 'sort='
+SORT_METHOD = ['totalVotes', 'reviewVolume']
 
 class MovieReviewDataset:
     def __init__(self):
-        self.dataset = np.array(["index","name","link","rating", "date", "review"],str).reshape(1,6)
-        # self.dataset = np.array([])
+        self.dataset = np.array(["movie_index", "link", "rating", "date", "review"],str).reshape(1,5)
+        self.movie_index=None
 
-    def _parse_review_data(self, index:int):
+    def _parse_review_data(self, movie_url:str, sort_method:str="curated", rating_filter:str='0'):
         try:
-            index_num = str(index).zfill(7)
-            response = requests.get(REVIEW_URL_START+index_num+REVIEW_URL_END)
+            input_url = REVIEW_URL_START+movie_url+REVIEW_URL_END+'?'+SORT_URL+sort_method+'&'+RATING_URL+rating_filter
+            response = requests.get(input_url)
             soup = BeautifulSoup(response.text, "html.parser")
+            print(input_url)
 
-            # 평점
-            rating = soup.select_one('span.rating-other-user-rating span')
-            rating = rating.get_text()
-            # print(rating.get_text())
+            reviews = soup.select('div.review-container')
+            for review in reviews:
+                # 리뷰 link
+                review_link = review.select_one('a.title')
+                review_link = review_link.attrs.get('href')
+                # print(review_link)
 
-            # 평점 7점 이상만 수집
-            if int(rating) < MIN_RATING:
-                print("rating is too low : ", rating)
-                return
+                # 날짜
+                review_date = review.select_one('.review-date')
+                if review_date == None:
+                    review_date = ""
+                else:
+                    review_date = review_date.get_text()
+                # print(review_date)
 
-            # 영화 제목, 링크
-            movie = soup.select_one('div.lister-item-header a')
-            link = movie.attrs.get('href')
-            movie_name = movie.get_text()
-            # print(movie_name, link)
+                # 리뷰
+                review_content = review.select_one('div.text.show-more__control')
+                review_content = review_content.get_text()
+                # print(review_content)
 
-            # 날짜
-            review_date = soup.select_one('.review-date')
-            if review_date == None:
-                review_date = ""
-            else:
-                review_date = review_date.get_text()
-
-            # 리뷰
-            review = soup.select_one('div.text.show-more__control')
-            review = review.get_text()
-            # print(review.get_text())
-            result = np.array([index_num, movie_name, link, rating, review_date, review],dtype=str).reshape(1,6)
-            self.dataset = np.append(self.dataset, result, axis=0)
+                result = np.array([self.movie_index, review_link, rating_filter, review_date, review_content],dtype=str).reshape(1,5)
+                self.dataset = np.append(self.dataset, result, axis=0)
+            print(self.dataset.shape)
 
         except Exception as e:
             print(e)
-            print("Fail to parse web :"+REVIEW_URL_START+index_num+REVIEW_URL_END)
-            # raise Exception("Fail to parse web :"+REVIEW_URL_START+index_num+REVIEW_URL_END)
+            print("Fail to parse web :"+input_url)
+            # raise Exception("Fail to parse web :"+input_url)
 
-    def saveMovieData(self, start_num:int, end_num:int):
-        for i in range(start_num, end_num+1):
-            self._parse_review_data(i)
+    def parseMovieData(self, movie_index:str, movie_url:str):
+        self.movie_index = movie_index
+        
+        for sort in SORT_METHOD:
+            for rating in RATING:
+                self._parse_review_data(movie_url, sort, rating)
 
+    def saveMovieData(self):
         df = pd.DataFrame(self.dataset)
-        file_name = 'movie_'+str(start_num)+'_'+str(end_num)+'.xlsx'
+        file_name = 'movie_'+self.movie_index+'.xlsx'
         df.to_excel(file_name, index=False)
         # np.savetxt(file_name,self.dataset, delimiter=',',fmt='%s')
 
@@ -75,9 +77,19 @@ class MovieReviewDataset:
         merged_data.to_excel("merged_file.xlsx", index=False)
 
 if __name__ == "__main__":
-    # dataset = MovieReviewDataset()
-    # dataset.saveMovieData(9080000,9089999)
+    movies = pd.read_excel('Data/Top250_Movies.xlsx')
+    movies = movies[12:15]
+    print(movies)
+    
+    for i, row in movies.iterrows():
+        movie_index = row[0]
+        movie_name = row[1]
+        movie_url = row[2]
+        print("*************** Movie:{0} **********************".format(movie_name))
+        dataset = MovieReviewDataset()
+        dataset.parseMovieData(movie_index,movie_url)
+        dataset.saveMovieData()
     
     # 파일 합치기
-    MovieReviewDataset.mergeMovieData("movie_9000000_9009999.xlsx", ["movie_9010000_9019999.xlsx", "movie_9020000_9059999.xlsx", "movie_9060000_9069999.xlsx"])
+    # MovieReviewDataset.mergeMovieData("movie_9000000_9009999.xlsx", ["movie_9010000_9019999.xlsx", "movie_9020000_9059999.xlsx", "movie_9060000_9069999.xlsx"])
     
