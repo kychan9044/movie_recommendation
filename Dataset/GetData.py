@@ -77,19 +77,23 @@ class MovieReviewDataset:
         merged_data.to_excel("merged_file.xlsx", index=False)
 
 if __name__ == "__main__":
-    movies = pd.read_excel('Data/Top250_Movies.xlsx')
-    movies = movies[12:15]
-    print(movies)
+    # movies = pd.read_excel('Data/Top250_Movies.xlsx')
+    # movies = movies[1:251]
+    # print(movies)
     
-    for i, row in movies.iterrows():
-        movie_index = row[0]
-        movie_name = row[1]
-        movie_url = row[2]
-        print("*************** Movie:{0} **********************".format(movie_name))
-        dataset = MovieReviewDataset()
-        dataset.parseMovieData(movie_index,movie_url)
-        dataset.saveMovieData()
+    # for i, row in movies.iterrows():
+    #     movie_index = row[0]
+    #     movie_name = row[1]
+    #     movie_url = row[2]
+    #     print("*************** Movie:{0} **********************".format(movie_name))
+    #     dataset = MovieReviewDataset()
+    #     dataset.parseMovieData(movie_index,movie_url)
+    #     dataset.saveMovieData()
     
     # 파일 합치기
-    # MovieReviewDataset.mergeMovieData("movie_9000000_9009999.xlsx", ["movie_9010000_9019999.xlsx", "movie_9020000_9059999.xlsx", "movie_9060000_9069999.xlsx"])
+    import time
+    for i in range(190,250):
+        print(i)
+        time.sleep(1)
+        MovieReviewDataset.mergeMovieData("merged_file.xlsx", [f'movie_{i}.xlsx'])
     
