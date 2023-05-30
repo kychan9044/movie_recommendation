@@ -8,7 +8,7 @@ from nltk.stem import WordNetLemmatizer
 
 
 
-df_Wordembbading = pd.read_excel("moview_6506000_6506500.xlsx")
+df_Wordembbading = pd.read_excel("movie_review.xlsx")
 wordembadding_df = pd.DataFrame(df_Wordembbading)
 
 # NLTK 자연어 처리 패키지를 사용하여 아래와 같이 전처리를 진행 
@@ -42,4 +42,4 @@ wordembadding_df[4] = wordembadding_df[4].apply(remove_stopwords)
 
 
 #전처리된 DataFrame을 새 파일에 저장
-wordembadding_df.to_excel('moview_test.xlsx', index=False)  
+wordembadding_df.to_excel('movie_review(preprocessing).xlsx', index=False)  
