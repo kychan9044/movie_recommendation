@@ -7,10 +7,10 @@
 #
 #####
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QBoxLayout, QPushButton, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QBoxLayout, QPushButton, QGraphicsDropShadowEffect, QLineEdit
 from PyQt5.QtCore import QObject, pyqtSignal,Qt, QPoint, QPropertyAnimation, QSize
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QFont
 import qtmodern.styles
 import qtmodern.windows
 
@@ -81,9 +81,9 @@ class TopLayout(QWidget):
         color = QColor(241, 246, 250, 255)
         shadow = color.darker(115).name()
         self.setStyleSheet(f'''QWidget#top-layout{{
-                        background-color: rgba(241, 246, 250, 100%);
+                        background-color: rgba(241, 243, 244, 100%);
                         border-radius: 20px;
-                        border-bottom: 3px solid {shadow};
+                        border: 3px solid {shadow};
                         padding: 0px;
                         margin: 0px;
                         }}''')
@@ -91,6 +91,18 @@ class TopLayout(QWidget):
         self.setLayout(self.top_layout)
         self.top_layout.setContentsMargins(0,0,0,0)
         self.top_layout.setAlignment(Qt.AlignTop)
+
+        self.search = QLineEdit(self)
+        self.search.setFixedHeight(45)
+        self.search.setFont(QFont('HY헤드라인M', 20))
+        self.search.setObjectName('search-input')
+        self.search.setStyleSheet(f'''#search-input{{
+                        background-color: rgba(241, 243, 244, 100%);
+                        padding: 0px;
+                        margin-left: 15px;
+                        qproperty-frame: false;
+                        }}''')
+        self.add_widget(self.search)
 
         self.button = QPushButton()
         self.button.setObjectName("search-button")
@@ -100,7 +112,7 @@ class TopLayout(QWidget):
                         background-color: rgba(241, 243, 244, 100%);
                         border-radius: 20px;
                         border: 3px solid {shadow};
-                        padding: 0px;
+                        padding-right: 3px;
                         margin: 0px;
                         }}''')
         self.button.setFixedSize(80,80)
