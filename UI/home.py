@@ -7,7 +7,7 @@
 #
 #####
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QBoxLayout, QPushButton, QGraphicsDropShadowEffect, QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QBoxLayout, QPushButton, QGraphicsDropShadowEffect, QLineEdit, QHBoxLayout, QLabel
 from PyQt5.QtCore import QObject, pyqtSignal,Qt, QPoint, QPropertyAnimation, QSize
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QColor, QFont
@@ -107,13 +107,14 @@ class TopLayout(QWidget):
         self.button = QPushButton()
         self.button.setObjectName("search-button")
         color = QColor(241, 243, 244, 255)
-        shadow = color.darker(115).name()
+        shadow = color.darker(100).name()
         self.button.setStyleSheet(f'''#search-button{{
                         background-color: rgba(241, 243, 244, 100%);
                         border-radius: 20px;
                         border: 3px solid {shadow};
                         padding-right: 3px;
-                        margin: 0px;
+                        margin: 5px;
+                        border-image : url("./UI/resource/movie_button.png");
                         }}''')
         self.button.setFixedSize(80,80)
         self.button.clicked.connect(self.call_click_cb)
@@ -151,9 +152,13 @@ class BodyLayout(QWidget):
         self.body_layout = QBoxLayout(QBoxLayout.TopToBottom)
         self.setLayout(self.body_layout)
         self.body_layout.setContentsMargins(0,0,0,0)
+
+        self.horizontal_layout = QHBoxLayout()
+        self.body_layout.addLayout(self.horizontal_layout)
         # self.installEventFilter(self)
         self.event_handler.click_cb.connect(self.expend_size)
         self.animation = None
+
 
     def expend_size(self):
         if (self.animation != None):
@@ -177,6 +182,13 @@ class BodyLayout(QWidget):
         self.animation.setStartValue(QSize(self.width(), BODY_EXPAND_HEIGHT))
         self.animation.setEndValue(QSize(self.width(), BODY_HEIGHT))
         self.animation.start()
+
+class HyperlinkLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.setStyleSheet('font-size: 20px')
+        self.setOpenExternalLinks(True)
+        self.setParent(parent)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
